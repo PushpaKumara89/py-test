@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine 
+    container_name: kubepulse-postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: kubepulse_db
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+    ports:
+      - "6060:5432" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kubepulse_net
+
+  backend:
+    build: ./kubepulse-backend
+    image: pushpakumara/kubepulse-backend:1.0.0
+    container_name: kubepulse-backend-app
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./kubepulse-backend/.env.prod
+    depends_on:
+      - db
+    networks:
+      - kubepulse_net
+    
+  frontend:
+    build: ./kubepulse-ui
+    image: pushpakumara/kubepulse-frontend:1.0.0
+    container_name: kubepulse-frontend-app
+    restart: always
+    ports:
+      - 4200:80
+    depends_on:
+      - backend
+    networks:
+      - kubepulse_net
+
+volumes:
+  postgres_data:
+
+networks:
+  kubepulse_net:
+    driver: bridge

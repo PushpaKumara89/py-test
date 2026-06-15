@@ -1,0 +1,23 @@
+# Python / Django
+__pycache__/
+*.pyc
+*.pod
+db.sqlite3
+.env
+.env.prod
+.venv/
+venv/
+
+# Node / Angular
+node_modules/
+/dist/
+.angular/
+.npm/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

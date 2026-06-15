@@ -1,0 +1,177 @@
+<div class="flex min-h-screen bg-slate-950 text-slate-100">
+  
+  <div class="w-64 md:w-72 bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between shrink-0">
+    <div>
+      <div class="flex items-center gap-3 mb-8 px-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-600/30">KP</div>
+        <span class="text-lg font-bold tracking-wider bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">KubePulse Engine</span>
+      </div>
+
+      <div class="flex items-center justify-between mb-4 px-2">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">My Projects ({{ projects.length }})</span>
+        <button (click)="showAddProjectModal = true" class="text-slate-400 hover:text-blue-400 transition-colors" title="Create New Project">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="space-y-1.5 overflow-y-auto max-h-[calc(100vh-200px)] pr-1">
+        <button *ngFor="let proj of projects"
+                (click)="selectProject(proj)"
+                [ngClass]="currentProject?.id === proj.id ? 'bg-blue-600/10 text-blue-400 border-blue-500/30' : 'text-slate-400 hover:bg-slate-800/60 border-transparent'"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all border text-left group">
+          <svg class="w-4 h-4 transition-colors group-hover:text-blue-400" [ngClass]="currentProject?.id === proj.id ? 'text-blue-400' : 'text-slate-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+          </svg>
+          <span class="truncate flex-1">{{ proj.name }}</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="border-t border-slate-800 pt-4 px-2 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-slate-300">PK</div>
+      <div class="truncate">
+        <p class="text-sm font-semibold text-white truncate">Pushpakumara</p>
+        <p class="text-xs text-slate-500 truncate">Software Engineer</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 p-6 overflow-x-hidden">
+    
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 border-b border-slate-800 pb-5 gap-4">
+      <div class="flex-1 min-w-0">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight truncate">
+          {{ currentProject ? currentProject.name : 'Loading Project...' }}
+        </h1>
+        <p class="text-sm text-slate-400 mt-1 break-words">
+          {{ currentProject ? currentProject.description : 'ප්‍රොජෙක්ට් එකක් තෝරන්න මචං...' }}
+        </p>
+      </div>
+      <button *ngIf="currentProject" (click)="showAddTaskModal = true" 
+              class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-blue-600/10 transition-all active:scale-95 self-start md:self-center shrink-0 whitespace-nowrap">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Add New Task
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col min-h-[550px]" (dragover)="$event.preventDefault()" (drop)="onDrop($event, 'TODO')">
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <h2 class="font-bold text-slate-200">To Do</h2>
+          </div>
+          <span class="bg-slate-800 text-slate-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-700/50">{{ getTasksByStatus('TODO').length }}</span>
+        </div>
+        <div class="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-1">
+          <div *ngFor="let task of getTasksByStatus('TODO')" draggable="true" (dragstart)="onDragStart(task)" class="p-4 bg-slate-800 border border-slate-700/60 hover:border-slate-600 rounded-xl shadow-lg cursor-move transition-all group">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded" [ngClass]="{'bg-red-500/10 text-red-400 border border-red-500/20': task.priority === 'HIGH', 'bg-amber-500/10 text-amber-400 border border-amber-500/20': task.priority === 'MEDIUM', 'bg-slate-700/40 text-slate-400 border border-slate-600/30': task.priority === 'LOW'}">{{ task.priority }}</span>
+            <h3 class="font-semibold text-white group-hover:text-blue-400 mt-2 transition-colors">{{ task.title }}</h3>
+            <p class="text-sm text-slate-400 mt-1 line-clamp-2">{{ task.description }}</p>
+          </div>
+          <div *ngIf="getTasksByStatus('TODO').length === 0" class="border-2 border-dashed border-slate-800/60 rounded-xl p-8 text-center text-slate-500 text-sm">දැනට Tasks මොකුත් නෑ</div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col min-h-[550px]" (dragover)="$event.preventDefault()" (drop)="onDrop($event, 'IN_PROGRESS')">
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <h2 class="font-bold text-slate-200">In Progress</h2>
+          </div>
+          <span class="bg-slate-800 text-slate-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-700/50">{{ getTasksByStatus('IN_PROGRESS').length }}</span>
+        </div>
+        <div class="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-1">
+          <div *ngFor="let task of getTasksByStatus('IN_PROGRESS')" draggable="true" (dragstart)="onDragStart(task)" class="p-4 bg-slate-800 border border-amber-500/20 hover:border-amber-500/40 rounded-xl shadow-lg cursor-move transition-all group">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded" [ngClass]="{'bg-red-500/10 text-red-400 border border-red-500/20': task.priority === 'HIGH', 'bg-amber-500/10 text-amber-400 border border-amber-500/20': task.priority === 'MEDIUM', 'bg-slate-700/40 text-slate-400 border border-slate-600/30': task.priority === 'LOW'}">{{ task.priority }}</span>
+            <h3 class="font-semibold text-white group-hover:text-amber-400 mt-2 transition-colors">{{ task.title }}</h3>
+            <p class="text-sm text-slate-400 mt-1 line-clamp-2">{{ task.description }}</p>
+          </div>
+          <div *ngIf="getTasksByStatus('IN_PROGRESS').length === 0" class="border-2 border-dashed border-slate-800/60 rounded-xl p-8 text-center text-slate-500 text-sm">වැඩ කරමින් පවතින Tasks නෑ</div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col min-h-[550px]" (dragover)="$event.preventDefault()" (drop)="onDrop($event, 'DONE')">
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <h2 class="font-bold text-slate-200">Done</h2>
+          </div>
+          <span class="bg-slate-800 text-slate-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-700/50">{{ getTasksByStatus('DONE').length }}</span>
+        </div>
+        <div class="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-1">
+          <div *ngFor="let task of getTasksByStatus('DONE')" draggable="true" (dragstart)="onDragStart(task)" class="p-4 bg-slate-800/80 border border-emerald-500/10 hover:border-emerald-500/30 rounded-xl shadow-lg cursor-move transition-all group opacity-85 hover:opacity-100">
+            <div class="flex justify-between items-start">
+              <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-700/40 text-slate-400">{{ task.priority }}</span>
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h3 class="font-semibold text-slate-400 line-through group-hover:text-emerald-400 mt-2 transition-colors">{{ task.title }}</h3>
+            <p class="text-sm text-slate-500 mt-1 line-clamp-2">{{ task.description }}</p>
+          </div>
+          <div *ngIf="getTasksByStatus('DONE').length === 0" class="border-2 border-dashed border-slate-800/60 rounded-xl p-8 text-center text-slate-500 text-sm">ඉවර කරපු වැඩ තාම නෑ</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="showAddProjectModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+        <h2 class="text-xl font-bold text-white">Add New Project</h2>
+        <button (click)="showAddProjectModal = false" class="text-slate-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+      </div>
+      <form (ngSubmit)="addNewProject()" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1">Project Name</label>
+          <input type="text" [(ngModel)]="newProject.name" name="projectName" required placeholder="උදා: KubePulse Mobile App" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1">Description</label>
+          <textarea [(ngModel)]="newProject.description" name="projectDesc" rows="3" placeholder="ප්‍රොජෙක්ට් එකේ අරමුණ ලියන්න..." class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm resize-none"></textarea>
+        </div>
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" (click)="showAddProjectModal = false" class="px-4 py-2 text-sm text-slate-400 hover:text-white">Cancel</button>
+          <button type="submit" [disabled]="!newProject.name.trim()" class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl font-semibold">Create Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="showAddTaskModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+        <h2 class="text-xl font-bold text-white">Create New Task</h2>
+        <button (click)="showAddTaskModal = false" class="text-slate-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+      </div>
+      <form (ngSubmit)="addNewTask()" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1">Task Title</label>
+          <input type="text" [(ngModel)]="newTask.title" name="title" required placeholder="උදා: API Integration" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1">Description</label>
+          <textarea [(ngModel)]="newTask.description" name="description" rows="3" placeholder="ටාස්ක් එක ගැන විස්තරයක්..." class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1">Priority</label>
+          <select [(ngModel)]="newTask.priority" name="priority" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm cursor-pointer">
+            <option value="LOW">Low Priority</option>
+            <option value="MEDIUM">Medium Priority</option>
+            <option value="HIGH">High Priority</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" (click)="showAddTaskModal = false" class="px-4 py-2 text-sm text-slate-400 hover:text-white">Cancel</button>
+          <button type="submit" [disabled]="!newTask.title.trim()" class="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl font-semibold">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

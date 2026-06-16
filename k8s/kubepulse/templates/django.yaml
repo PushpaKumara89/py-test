@@ -32,7 +32,7 @@ spec:
             port: 8000
             httpHeaders:
             - name: Host
-              value: api.kubepulse.local
+              value: {{ .Values.ingress.backendHost }}
           initialDelaySeconds: 10
         livenessProbe:
           httpGet:
@@ -40,7 +40,7 @@ spec:
             port: 8000
             httpHeaders:
             - name: Host
-              value: api.kubepulse.local
+              value: {{ .Values.ingress.backendHost }}
           initialDelaySeconds: 20
 ---
 apiVersion: v1

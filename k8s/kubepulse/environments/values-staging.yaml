@@ -24,6 +24,6 @@ frontend:
     tag: "1.0.0"
 
 ingress:
-  enabled: true
+  enabled: false
   frontendHost: stg.frontend.kubepulse.local
   backendHost: stg.api.kubepulse.local

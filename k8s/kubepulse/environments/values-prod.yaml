@@ -1,0 +1,28 @@
+image:
+  repository: pushpakumara/kubepulse-backend
+  tag: "1.0.0"
+
+django:
+  replicas: 2
+  port: 8000
+
+postgres:
+  db: kubepulse_db
+  user: postgres_user
+  password: postgres_password
+  storage: 10Gi
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+  port: 6379
+  serviceName: redis
+
+frontend:
+  image:
+    repository: pushpakumara/kubepulse-frontend
+    tag: "1.0.0"
+
+ingress:
+  frontendHost: kubepulse.local.frontend
+  backendHost: kubepulse.local.api
